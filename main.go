@@ -2,24 +2,22 @@ package main
 
 import (
 	"log"
-	"sync"
 	"strconv"
+	"sync"
 
-	"github.com/jhphon0730/crawler_auto_dcdc/pkg/model"
 	"github.com/jhphon0730/crawler_auto_dcdc/pkg/crawler"
 	"github.com/jhphon0730/crawler_auto_dcdc/pkg/database"
+	"github.com/jhphon0730/crawler_auto_dcdc/pkg/model"
 )
 
 var (
 	// key is post number
-	posts map[int]*model.Post = make(map[int]*model.Post)
-
-	isRunning bool = false
-
-	mu sync.Mutex
+	posts     map[int]*model.Post = make(map[int]*model.Post)
+	isRunning bool                = false
+	mu        sync.Mutex
 )
 
-// 해당 함수가 매일 새벽 6시에 실행 된다고 가정 ( cron )
+// 해당 함수가 매일 새벽 6시에 실행 된다고 가정 (cron)
 func ScheduleFunc() {
 	if isRunning {
 		log.Println("Already running")
@@ -64,13 +62,11 @@ func ScheduleFunc() {
 		mu.Unlock()
 	}
 
-	go func() {
-		for err := range errChan {
-			log.Println("Error:", err)
-		}
-	}()
-
 	wg.Wait()
+	// 에러를 직접 처리
+	for err := range errChan {
+		log.Println("Error:", err)
+	}
 	close(postChan)
 	close(errChan)
 
@@ -84,7 +80,6 @@ func ScheduleFunc() {
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 
 	if err := database.InitDB("db.db"); err != nil {
 		log.Println("Failed to init DB:", err)
