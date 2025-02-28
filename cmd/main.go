@@ -19,76 +19,65 @@ var (
 
 // 해당 함수가 매일 새벽 6시에 실행 된다고 가정 (cron)
 func ScheduleFunc() {
-	log.Println("Start ScheduleFunc")
-
-	mu.Lock()
 	if isRunning {
 		log.Println("Already running")
-		mu.Unlock()
 		return
 	}
 	isRunning = true
-	mu.Unlock()
 
 	defer func() {
-		mu.Lock()
 		isRunning = false
-		mu.Unlock()
 	}()
 
+	// posts 초기화 및 post, err 채널 생성
 	posts = make(map[int]*model.Post)
 	newPosts := make(map[int]*model.Post)
 	postChan := make(chan *model.Post)
 	errChan := make(chan error)
 
 	var wg sync.WaitGroup
-	maxPage := 2
+	maxPage := 10
 
 	if err := database.LoadPosts(posts); err != nil {
 		return
 	}
-	log.Println("Loaded posts count:", len(posts))
 
 	for i := 1; i <= maxPage; i++ {
 		wg.Add(1)
-		page := strconv.Itoa(i)
 		go func(page string) {
-			defer wg.Done()
 			crawler.GetPostBody(page, postChan, errChan, &wg)
-		}(page)
+		}(strconv.Itoa(i))
 	}
-
-	go func() {
-		wg.Wait()
-		close(postChan)
-		close(errChan)
-	}()
 
 	for post := range postChan {
 		mu.Lock()
 		if posts[post.PostNumber] == nil {
 			posts[post.PostNumber] = post
 			newPosts[post.PostNumber] = post
-			log.Println("New post:", post.PostNumber)
 		}
 		mu.Unlock()
 	}
 
+	wg.Wait()
+	// 에러를 직접 처리
 	for err := range errChan {
 		log.Println("Error:", err)
 	}
+	close(postChan)
+	close(errChan)
 
 	log.Println("Crawler Done")
 	if err := database.SavePosts(newPosts); err != nil {
 		log.Println("Failed to save posts:", err)
 		return
 	}
+	log.Println("Saved posts count:", len(newPosts))
 }
 
 func main() {
 	// log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	if err := database.InitDB("test.db"); err != nil {
+	if err := database.InitDB("db.db"); err != nil {
 		log.Println("Failed to init DB:", err)
 		return
 	}
