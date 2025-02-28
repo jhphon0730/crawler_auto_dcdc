@@ -36,7 +36,6 @@ func GetPostBody(pageNumber string, postChan chan *model.Post, errChan chan erro
 }
 
 func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error, wg *sync.WaitGroup) {
-	defer wg.Done()
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
@@ -45,6 +44,8 @@ func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error, w
 	}
 
 	doc.Find(POST_WRAPPER).Each(func(i int, s *goquery.Selection) {
+		defer wg.Done()
+		wg.Add(1)
 		var post *model.Post = &model.Post{}
 
 		// post number
@@ -75,7 +76,6 @@ func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error, w
 		post.DataType = post_type
 
 		postChan <- post
-		return
 	})
 
 	return
