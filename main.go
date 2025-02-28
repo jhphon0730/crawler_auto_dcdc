@@ -19,6 +19,8 @@ var (
 
 // 해당 함수가 매일 새벽 6시에 실행 된다고 가정 (cron)
 func ScheduleFunc() {
+	log.Println("Start Crawler")
+
 	if isRunning {
 		log.Println("Already running")
 		return
@@ -38,13 +40,12 @@ func ScheduleFunc() {
 	var wg sync.WaitGroup
 	maxPage := 10
 
-	wg.Add(1)
 	if err := database.LoadPosts(posts); err != nil {
 		wg.Done()
+		log.Println("Failed to load posts:", err)
 		return
 	}
-	wg.Done()
-	wg.Wait()
+	log.Println("Loaded posts count:", len(posts))
 
 	for i := 1; i <= maxPage; i++ {
 		wg.Add(1)
@@ -58,6 +59,7 @@ func ScheduleFunc() {
 		if posts[post.PostNumber] == nil {
 			posts[post.PostNumber] = post
 			newPosts[post.PostNumber] = post
+			log.Println("New post:", post.PostNumber)
 		}
 		mu.Unlock()
 	}
@@ -78,16 +80,8 @@ func ScheduleFunc() {
 	log.Println("Saved posts count:", len(newPosts))
 }
 
+
 func main() {
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	if err := database.InitDB("db.db"); err != nil {
-		log.Println("Failed to init DB:", err)
-		return
-	}
-	defer database.CloseDB()
-
 	ScheduleFunc()
-
-	select {}
 }
+

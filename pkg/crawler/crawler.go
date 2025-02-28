@@ -28,11 +28,10 @@ func GetPostBody(pageNumber string, postChan chan *model.Post, errChan chan erro
 	body, err := network.GetRequest(BASE_URL + pageNumber, nil)
 	if err != nil {
 		errChan <- err
-		wg.Done()
 		return 
 	}
 
-	go parsePostBody(body, postChan, errChan, wg)
+	parsePostBody(body, postChan, errChan, wg)
 	return
 }
 
