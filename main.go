@@ -7,6 +7,7 @@ import (
 
 	"github.com/jhphon0730/crawler_auto_dcdc/pkg/model"
 	"github.com/jhphon0730/crawler_auto_dcdc/pkg/crawler"
+	"github.com/jhphon0730/crawler_auto_dcdc/pkg/database"
 )
 
 var (
@@ -32,11 +33,20 @@ func ScheduleFunc() {
 
 	// posts 초기화 및 post, err 채널 생성
 	posts = make(map[int]*model.Post)
+	newPosts := make(map[int]*model.Post)
 	postChan := make(chan *model.Post)
 	errChan := make(chan error)
 
 	var wg sync.WaitGroup
 	maxPage := 10
+
+	wg.Add(1)
+	if err := database.LoadPosts(posts); err != nil {
+		wg.Done()
+		return
+	}
+	wg.Done()
+	wg.Wait()
 
 	for i := 1; i <= maxPage; i++ {
 		wg.Add(1)
@@ -45,18 +55,11 @@ func ScheduleFunc() {
 		}(strconv.Itoa(i))
 	}
 
-	go func() {
-		wg.Wait()
-		close(postChan)
-	}()
-
 	for post := range postChan {
 		mu.Lock()
 		if posts[post.PostNumber] == nil {
 			posts[post.PostNumber] = post
-			log.Println("Insert post number:", post.PostNumber)
-		} else {
-			log.Println("Already exist post number:", post.PostNumber)
+			newPosts[post.PostNumber] = post
 		}
 		mu.Unlock()
 	}
@@ -67,12 +70,27 @@ func ScheduleFunc() {
 		}
 	}()
 
-	log.Println("Finish")
-	log.Println("Posts Count:", len(posts))
+	wg.Wait()
+	close(postChan)
+	close(errChan)
+
+	log.Println("Crawler Done")
+	if err := database.SavePosts(newPosts); err != nil {
+		log.Println("Failed to save posts:", err)
+		return
+	}
+	log.Println("Saved posts count:", len(newPosts))
 }
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+
+	if err := database.InitDB("db.db"); err != nil {
+		log.Println("Failed to init DB:", err)
+		return
+	}
+	defer database.CloseDB()
 
 	ScheduleFunc()
 
