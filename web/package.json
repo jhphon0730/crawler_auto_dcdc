@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-slot": "^1.1.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -46,6 +48,7 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^7.1.0"
+    "@craco/craco": "^7.1.0",
+    "postcss-import": "^16.1.0"
   }
 }

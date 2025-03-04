@@ -1,12 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-* {
-	margin: 0;
-	padding: 0;
-}
-
 @import "tailwindcss";
 
 @plugin 'tailwindcss-animate';
@@ -131,4 +122,3 @@
     @apply bg-background text-foreground;
   }
 }
-
