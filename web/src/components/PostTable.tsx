@@ -218,7 +218,7 @@ export default function PostsPage() {
       </div>
 
       {!loading && totalPages > 0 && (
-        <div className="mt-4">
+        <div className="mt-4 cursor-pointer">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
