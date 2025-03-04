@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { Test } from "@/types/quit";
+import { Post } from "@/types/post";
 
 const App = () => {
 	return (
 		<div className="bg-red-300">
-			{Test}
+			123
 		</div>
 	);
 };
