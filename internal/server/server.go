@@ -46,7 +46,9 @@ func InitialServer() {
 
 	// cors
 	cors_cfg := cors.Config{
+		// 모든 사용자 OK
 		AllowOrigins:     []string{"*"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 	}
 	r.Use(cors.New(cors_cfg))

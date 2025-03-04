@@ -14,7 +14,7 @@ type GetPostsResponse = {
 
 export const GetPosts = async (page = 1, limit = 10): Promise<GetPostsResponse> => {
 	try {
-		const res = await fetch(`http://localhost:8080/api/posts?page=${page}&limit=${limit}`);
+		const res = await fetch(`http://192.168.0.5:8080/api/posts?page=${page}&limit=${limit}`);
 
 		if (!res.ok) {
 			throw new Error('Failed to fetch posts');
