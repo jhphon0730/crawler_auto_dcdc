@@ -59,6 +59,9 @@ func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error) {
 		// post title
 		post_title := s.Find(POST_TITLE).Text()
 		post.Title = strings.TrimSpace(post_title)
+		if strings.Contains(post.Title, "[") && strings.Contains(post.Title, "]") {
+			post.Title = post.Title[:strings.Index(post.Title, "[")]
+		}
 
 		// post writer
 		post_writer := s.Find(POST_WRITER).Text()

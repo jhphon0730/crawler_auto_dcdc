@@ -15,6 +15,8 @@ var (
 	posts     map[int]*model.Post = make(map[int]*model.Post)
 	isRunning bool                = false
 	mu        sync.Mutex
+
+	maxPage int = 10
 )
 
 // 해당 함수가 매일 새벽 6시에 실행 된다고 가정 (cron)
@@ -42,7 +44,6 @@ func ScheduleFunc() {
 	errChan := make(chan error)
 
 	var wg sync.WaitGroup
-	maxPage := 100
 
 	mu.Lock()
 	if err := database.LoadPosts(posts); err != nil {
