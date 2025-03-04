@@ -1,7 +1,6 @@
 package crawler
 
 import (
-	"sync"
 	"bytes"
 	"strings"
 	"strconv"
@@ -24,18 +23,18 @@ const (
 	POST_WRITE_DATE_TITLE = "title"
 )
 
-func GetPostBody(pageNumber string, postChan chan *model.Post, errChan chan error, wg *sync.WaitGroup) {
+func GetPostBody(pageNumber string, postChan chan *model.Post, errChan chan error) {
 	body, err := network.GetRequest(BASE_URL + pageNumber, nil)
 	if err != nil {
 		errChan <- err
 		return 
 	}
 
-	parsePostBody(body, postChan, errChan, wg)
+	parsePostBody(body, postChan, errChan)
 	return
 }
 
-func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error, wg *sync.WaitGroup) {
+func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error) {
 
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
@@ -44,8 +43,6 @@ func parsePostBody(body []byte, postChan chan *model.Post, errChan chan error, w
 	}
 
 	doc.Find(POST_WRAPPER).Each(func(i int, s *goquery.Selection) {
-		defer wg.Done()
-		wg.Add(1)
 		var post *model.Post = &model.Post{}
 
 		// post number

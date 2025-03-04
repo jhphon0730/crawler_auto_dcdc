@@ -54,7 +54,7 @@ func ScheduleFunc() {
 		page := strconv.Itoa(i)
 		go func(page string) {
 			defer wg.Done()
-			crawler.GetPostBody(page, postChan, errChan, &wg)
+			crawler.GetPostBody(page, postChan, errChan)
 		}(page)
 	}
 
