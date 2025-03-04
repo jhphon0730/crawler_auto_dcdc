@@ -42,11 +42,13 @@ func ScheduleFunc() {
 	errChan := make(chan error)
 
 	var wg sync.WaitGroup
-	maxPage := 2
+	maxPage := 100
 
+	mu.Lock()
 	if err := database.LoadPosts(posts); err != nil {
 		return
 	}
+	mu.Unlock()
 	log.Println("Loaded posts count:", len(posts))
 
 	for i := 1; i <= maxPage; i++ {
@@ -69,7 +71,6 @@ func ScheduleFunc() {
 		if posts[post.PostNumber] == nil {
 			posts[post.PostNumber] = post
 			newPosts[post.PostNumber] = post
-			log.Println("New post:", post.PostNumber)
 		}
 		mu.Unlock()
 	}
@@ -83,6 +84,13 @@ func ScheduleFunc() {
 		log.Println("Failed to save posts:", err)
 		return
 	}
+
+	if len(newPosts) > 0 {
+		log.Println("New posts count:", len(newPosts))
+	} else {
+		log.Println("No new posts")
+	}
+	return
 }
 
 func main() {
