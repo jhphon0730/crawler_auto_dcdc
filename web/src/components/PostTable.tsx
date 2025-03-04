@@ -143,8 +143,6 @@ export default function PostsPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-2xl font-bold mb-6">게시글 목록</h1>
-
       <div className="flex justify-between items-center mb-4">
         <div className="text-sm text-muted-foreground">
           {!loading && totalPosts > 0 && (
