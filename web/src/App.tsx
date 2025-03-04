@@ -1,11 +1,13 @@
 import React from 'react';
 
+import PostTable from "@/components/PostTable";
+
 const App = () => {
 	return (
-		<div className="bg-red-300">
-			123
-		</div>
-	);
-};
+		<main className="min-h-screen bg-background container mx-auto">
+			<PostTable />
+		</main>
+	)
+}
 
 export default App;

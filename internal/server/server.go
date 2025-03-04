@@ -20,8 +20,17 @@ func GetPosts(c *gin.Context) {
 		return
 	}
 
+	postCount, err := database.GetPostCount()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
 	c.JSON(200, gin.H{
-	"posts": posts,
+		"post_count": postCount,
+		"posts": posts,
 	})
 }
 

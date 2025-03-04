@@ -8,4 +8,9 @@ module.exports = {
       "@": path.resolve(__dirname, "src/"),
     },
   },
+  style: {
+    postcssOptions: {
+      plugins: [require("tailwindcss"), require("autoprefixer")],
+    },
+  },
 };

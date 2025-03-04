@@ -101,7 +101,6 @@ func LoadPosts(posts map[int]*model.Post) error {
 func LoadPostsByArray(limitStr, pageStr string) ([]model.Post, error) {
 	var posts []model.Post
 
-	// 1. 문자열을 정수로 변환
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil || limit <= 0 {
 		return posts, fmt.Errorf("invalid limit: %v", limitStr)
@@ -112,10 +111,9 @@ func LoadPostsByArray(limitStr, pageStr string) ([]model.Post, error) {
 		return posts, fmt.Errorf("invalid page: %v", pageStr)
 	}
 
-	// 2. OFFSET 계산: (page - 1) * limit
+	// OFFSET 계산: (page - 1) * limit
 	offset := (page - 1) * limit
 
-	// 3. 쿼리 실행
 	rows, err := db.Query(`
 		SELECT post_number, title, content, writer, write_date, data_type 
 		FROM posts 
@@ -124,9 +122,8 @@ func LoadPostsByArray(limitStr, pageStr string) ([]model.Post, error) {
 	if err != nil {
 		return posts, err
 	}
-	defer rows.Close() // 반드시 rows를 닫아야 함
+	defer rows.Close() 
 
-	// 4. 결과 처리
 	for rows.Next() {
 		var p model.Post
 		err := rows.Scan(&p.PostNumber, &p.Title, &p.Content, &p.Writer, &p.WriteDate, &p.DataType)
@@ -136,12 +133,21 @@ func LoadPostsByArray(limitStr, pageStr string) ([]model.Post, error) {
 		posts = append(posts, p)
 	}
 
-	// 5. 에러 체크
 	if err = rows.Err(); err != nil {
 		return posts, err
 	}
 
 	return posts, nil
+}
+
+// 데이터가 몇 개인지 반환 ( 필요 시 사용 )
+func GetPostCount() (int, error) {
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM posts").Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 // CloseDB는 데이터베이스 연결을 닫음 (필요 시 호출)
