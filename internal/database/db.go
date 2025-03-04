@@ -3,7 +3,7 @@ package database
 import (
 	"database/sql"
 
-	"github.com/jhphon0730/crawler_auto_dcdc/pkg/model"
+	"github.com/jhphon0730/crawler_auto_dcdc/internal/model"
 	_ "github.com/mattn/go-sqlite3"
 )
 

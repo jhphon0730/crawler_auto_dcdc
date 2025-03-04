@@ -6,8 +6,9 @@ import (
 	"sync"
 
 	"github.com/jhphon0730/crawler_auto_dcdc/pkg/crawler"
-	"github.com/jhphon0730/crawler_auto_dcdc/pkg/database"
-	"github.com/jhphon0730/crawler_auto_dcdc/pkg/model"
+	"github.com/jhphon0730/crawler_auto_dcdc/internal/model"
+	"github.com/jhphon0730/crawler_auto_dcdc/internal/server"
+	"github.com/jhphon0730/crawler_auto_dcdc/internal/database"
 )
 
 var (
@@ -95,13 +96,12 @@ func ScheduleFunc() {
 }
 
 func main() {
-	// log.SetFlags(log.LstdFlags | log.Lshortfile)
-
 	if err := database.InitDB("test.db"); err != nil {
-		log.Println("Failed to init DB:", err)
+		log.Fatalln("Failed to init DB:", err)
 		return
 	}
 	defer database.CloseDB()
 
-	ScheduleFunc()
+	// Initial & Run server
+	server.InitialServer()
 }

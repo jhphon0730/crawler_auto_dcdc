@@ -7,7 +7,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 
-	"github.com/jhphon0730/crawler_auto_dcdc/pkg/model"
+	"github.com/jhphon0730/crawler_auto_dcdc/internal/model"
 	"github.com/jhphon0730/crawler_auto_dcdc/pkg/network"
 )
 
